@@ -1,0 +1,74 @@
+:root {
+    /* Color Definitions */
+    --background-color: #f4f4f4;
+    --form-background-color: white;
+    --input-border-color: #ddd;
+    --button-background-color: rgb(255, 24, 182); /* #5cb85c; */
+    --button-hover-background-color: rgb(209, 28, 152);
+    --button-text-color: white;
+    --highlight-border-color: rgb(255, 24, 182);
+    --highlight-shadow-color: rgb(255, 24, 182);
+    --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: var(--background-color);
+}
+
+h1 {
+    text-align: center;
+    color: var(--button-background-color);
+}
+
+form {
+    background: var(--form-background-color);
+    width: 200px;
+    padding: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 8px;
+    box-shadow: 0 0 10px var(--shadow-color);
+}
+
+input[type="number"] {
+    padding: 8px;
+    margin-top: 5px;
+    border: 2px solid var(--input-border-color);
+    border-radius: 4px;
+    display: block;
+    width: 90%;
+    margin-right: 10px;
+}
+
+button {
+    padding: 8px;
+    margin-top: 5px;
+    border: 2px solid var(--input-border-color);
+    border-radius: 4px;
+    display: block;
+    width: 100%;
+    background-color: var(--button-background-color);
+    color: var(--button-text-color);
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: var(--button-hover-background-color);
+}
+
+label {
+    margin-top: 10px;
+}
+
+.mbc_line {
+    margin-bottom: 10px;
+}
+
+.highlighted {
+    outline: 2px solid var(--highlight-border-color);
+    box-shadow: 0 0 8px var(--highlight-shadow-color);
+}
