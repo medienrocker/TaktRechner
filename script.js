@@ -44,3 +44,39 @@ window.onload = function () {
         calculateMusic();
     });
 }
+
+// Calculate BPM from Tap-Tempo
+let tapTimes = [];
+let bpmTimeout;
+
+function tapBPM() {
+    const now = new Date().getTime();
+    tapTimes.push(now);
+    const bpmInput = document.getElementById('bpm');
+
+    // Clear previous highlight
+    bpmInput.classList.remove('highlighted');
+
+    // When there are two or more taps, calculate the BPM
+    if (tapTimes.length > 1) {
+        const intervals = tapTimes.slice(1).map((time, index) => {
+            return time - tapTimes[index];
+        });
+        const averageInterval = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+        const bpm = 60000 / averageInterval; // Convert ms to BPM
+        bpmInput.value = Math.round(bpm);
+
+        // Highlight the BPM input field
+        bpmInput.classList.add('highlighted');
+    }
+
+    // Reset if more than 2 seconds pass between taps
+    clearTimeout(bpmTimeout);
+    bpmTimeout = setTimeout(() => {
+        tapTimes = [];
+        bpmInput.classList.remove('highlighted');
+    }, 2000);
+}
+
+document.getElementById('bpmTapper').addEventListener('click', tapBPM);
+
