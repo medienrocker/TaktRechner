@@ -109,6 +109,10 @@ function handleInput(event) {
     const minutes = minutesInput.value.trim();
     const seconds = secondsInput.value.trim();
     const bpm = bpmInput.value.trim();
+    const rhythmSelected = document.getElementById("rhythmSelect").value;
+    const canPlay = bpm && (bars || minutes || seconds) && rhythmSelected;
+
+    document.getElementById("playButton").disabled = !canPlay;
 
     // Log current input states
     console.log(`Input states: Bars: ${bars}, Minutes: ${minutes}, Seconds: ${seconds}, BPM: ${bpm}`);
@@ -226,7 +230,8 @@ function updateHint() {
     hintContainer.style.display = "block";
 }
 
-// Metronom functionality
+
+// Metronom functionality ++++++++++++++++++++++++++++++++++++
 document.getElementById("playButton").addEventListener("click", function () {
     startMetronome();
 });
@@ -236,45 +241,83 @@ document.getElementById("stopButton").addEventListener("click", function () {
 });
 
 let metronomeInterval;
+function getTickInterval(bpm, rhythmFactor) {
+    // Returns the interval duration based on the rhythm factor
+    return (60000 / bpm) / rhythmFactor; // Shorter intervals for more frequent ticks
+}
+
+function calculateTicksPerBar(rhythmValue) {
+    // Determines how many ticks occur in one bar based on the rhythm
+    switch (rhythmValue) {
+        case "1": // Full note (1)
+            return 1; // 4 ticks per bar in 4/4 time
+        case "2": // Quarter note (1/4)
+            return 2; // 4 ticks per bar in 4/4 time
+        case "3": // Eighth note (1/8)
+            return 4; // 8 ticks per bar in 4/4 time
+        case "4": // Dotted quarter note (6/8)
+            return 3; // 6 ticks per bar in 6/8 time
+        default:
+            return 1; // Default to quarter note if unsure
+    }
+}
+
+function playMetronomeIndefinitelyOrForDuration(totalTime, bpm, rhythmValue) {
+    const ticksPerBar = calculateTicksPerBar(rhythmValue);
+    const intervalDuration = (60000 / bpm) / ticksPerBar;
+
+    let totalTicks = Infinity;
+    if (totalTime > 0) {
+        // Calculate the total number of intervals that fit in the total time
+        totalTicks = Math.floor(totalTime / intervalDuration);
+    }
+
+    if (metronomeInterval) {
+        clearInterval(metronomeInterval); // Clear previous interval if any
+    }
+    metronomeInterval = setInterval(playSound, intervalDuration);
+
+    if (totalTicks !== Infinity) {
+        setTimeout(() => {
+            stopMetronome(); // Stop after the calculated number of ticks
+        }, totalTicks * intervalDuration);
+    }
+}
+
+
 function startMetronome() {
     const bpm = parseInt(document.getElementById("bpm").value);
+    const rhythmValue = document.getElementById("rhythmSelect").value;
+    const bars = document.getElementById("bars").value.trim();
+    const minutes = document.getElementById("minutes").value.trim();
+    const seconds = document.getElementById("seconds").value.trim();
+
     if (isNaN(bpm) || bpm <= 0) {
         alert("Please enter a valid BPM.");
         return;
     }
 
-    const rhythmValue = document.getElementById("rhythmSelect").value;
-    const beatDuration = 60000 / bpm; // Duration of one beat in milliseconds
-
-    let rhythmFactor;
-    switch (rhythmValue) {
-        case "1":
-            rhythmFactor = 1; // Quarter note
-            break;
-        case "2":
-            rhythmFactor = 0.5; // Eighth note
-            break;
-        case "3":
-            rhythmFactor = 1.5; // Dotted quarter note for 6/8 time
-            break;
-        default:
-            rhythmFactor = 1;
+    let totalTime = 0;
+    if (bars) {
+        totalTime = (60000 / bpm) * bars * 4; // Total duration for 4 beats per bar
+    } else if (minutes || seconds) {
+        totalTime = (parseInt(minutes) * 60 + parseInt(seconds)) * 1000;
     }
 
-    const intervalDuration = beatDuration * rhythmFactor;
-
-    if (metronomeInterval) clearInterval(metronomeInterval);
-    metronomeInterval = setInterval(playSound, intervalDuration);
+    // Start playing the metronome
+    playMetronomeIndefinitelyOrForDuration(totalTime, bpm, rhythmValue);
 
     document.getElementById("playButton").disabled = true;
     document.getElementById("stopButton").disabled = false;
 }
+
 
 function stopMetronome() {
     clearInterval(metronomeInterval);
     document.getElementById("playButton").disabled = false;
     document.getElementById("stopButton").disabled = true;
 }
+
 
 
 // Create a single Audio object to be reused
