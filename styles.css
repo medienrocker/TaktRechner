@@ -30,7 +30,7 @@ h1 {
 
 form {
     background: var(--form-background-color);
-    width: 200px;
+    width: 220px;
     padding: 20px;
     margin-left: auto;
     margin-right: auto;
@@ -44,7 +44,7 @@ input[type="number"] {
     border: 2px solid var(--input-border-color);
     border-radius: 4px;
     display: block;
-    width: 90%;
+    width: 92%;
     margin-right: 10px;
 }
 

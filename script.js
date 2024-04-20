@@ -1,13 +1,50 @@
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
+// initialize base variables
 let tapTimes = [];
 let bpmTimeout;
 let lastCalculated = null;
-// Initialize lastCalculated with the ID of the field you expect to be calculated last
-//lastCalculated = "bpm"; // For example
+
+// adds event listeners to all input fields and
+// adds the sanitize function to all input fields
+document.addEventListener("DOMContentLoaded", function () {
+    // Bindet handleInput an alle Nummerneingabefelder
+    document.querySelectorAll('input[type="number"]').forEach((inputField) => {
+        inputField.addEventListener("input", handleInput);
+    });
+
+    // Bindet calculateMusic an den Calculate-Button
+    document.getElementById("calculateButton").addEventListener("click", calculateMusic);
+
+    // Bindet tapBPM an den BPM Tapper-Button
+    document.getElementById("bpmTapper").addEventListener("click", tapBPM);
+
+    // Bindet resetFields an den Reset-Button
+    document.getElementById("resetButton").addEventListener("click", resetFields);
+
+    // Globaler Event Listener für die Eingabesanierung
+    document.addEventListener('input', function (event) {
+        if (event.target.type === 'number') {
+            sanitizeInput(event);
+        }
+    });
+
+    // Initialer Aufruf von handleInput, um den korrekten Zustand des Calculate-Buttons zu setzen
+    handleInput();
+});
+
+
+function sanitizeInput(event) {
+    // Allow numbers, a minus sign at the start, and a single decimal point
+    event.target.value = event.target.value
+        .replace(/[^0-9.-]/g, '')
+        .replace(/(\..*)\./g, '$1') // only allow one decimal point
+        .replace(/(?!^)-/g, ''); // allow minus sign only at the start
+}
+
 
 // Function to calculate music values based on the filled inputs
 function calculateMusic() {
+    console.log("calculateMusic function started");
     const barsInput = document.getElementById("bars");
     const minutesInput = document.getElementById("minutes");
     const secondsInput = document.getElementById("seconds");
@@ -20,33 +57,45 @@ function calculateMusic() {
     let bpm = parseInt(bpmInput.value);
     let calculatedFields = [];
 
-    // Clear highlights from all fields before new calculation
-    [barsInput, minutesInput, secondsInput, bpmInput].forEach((input) => {
-        input.classList.remove("highlighted");
-    });
-
     // Perform calculations only if the appropriate pairs of inputs are provided
     if (bars && bpm && !minutes && !seconds) {
+        //console.log("Calculating time from bars and bpm");
         totalSeconds = Math.ceil((bars * 60) / bpm);
         minutesInput.value = Math.floor(totalSeconds / 60);
         secondsInput.value = totalSeconds % 60;
-        calculatedFields = [minutesInput, secondsInput]; // Store calculated fields
+        calculatedFields = [minutesInput, secondsInput];
     } else if (totalSeconds > 0 && bpm && !bars) {
+        //console.log("Calculating bars from totalSeconds and bpm");
         bars = Math.ceil((totalSeconds * bpm) / 60);
         barsInput.value = bars;
-        calculatedFields = [barsInput]; // Store calculated fields
+        calculatedFields = [barsInput];
     } else if (bars && totalSeconds > 0 && !bpm) {
+        //console.log("Calculating bpm from bars and totalSeconds");
         bpm = Math.ceil((bars * 60) / totalSeconds);
         bpmInput.value = bpm;
-        calculatedFields = [bpmInput]; // Store calculated fields
+        calculatedFields = [bpmInput];
     }
+    //onsole.log(`calculatedFields: `, calculatedFields.map(field => field.id));
+
+
+    // Clear highlights from all fields except those being recalculated
+    [barsInput, minutesInput, secondsInput, bpmInput].forEach((input) => {
+        if (!calculatedFields.includes(input)) {
+            input.classList.remove("highlighted");
+        }
+    });
 
     // Highlight all calculated fields
-    calculatedFields.forEach((field) => field.classList.add("highlighted"));
+    calculatedFields.forEach((field) => {
+        field.classList.add("highlighted");
+    });
 }
 
+
+
+
 // Function to handle input changes
-function handleInput() {
+function handleInput() {    
     const barsInput = document.getElementById("bars");
     const minutesInput = document.getElementById("minutes");
     const secondsInput = document.getElementById("seconds");
@@ -74,15 +123,9 @@ function handleInput() {
     document.getElementById("calculateButton").disabled = !isValidCombination;
 }
 
-// Attach event listeners to each input field for any 'input' event
-document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll('input[type="number"]').forEach((inputField) => {
-        inputField.addEventListener("input", handleInput);
-    });
-});
-
 // Initial call to handleInput to set the proper state on page load
 handleInput();
+
 
 // get the BPM from tapping the "Tap" button
 document.getElementById("bpmTapper").addEventListener("click", tapBPM);
@@ -118,6 +161,7 @@ function tapBPM() {
     }, 2000);
     handleInput();
 }
+
 
 // resets all input fields
 function resetFields() {
