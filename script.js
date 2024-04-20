@@ -3,6 +3,13 @@
 let tapTimes = [];
 let bpmTimeout;
 let lastCalculated = null;
+let inputModified = {
+    bars: false,
+    minutes: false,
+    seconds: false,
+    bpm: false
+};
+
 
 // adds event listeners to all input fields and
 // adds the sanitize function to all input fields
@@ -44,7 +51,7 @@ function sanitizeInput(event) {
 
 // Function to calculate music values based on the filled inputs
 function calculateMusic() {
-    console.log("calculateMusic function started");
+    //console.log("calculateMusic function started");
     const barsInput = document.getElementById("bars");
     const minutesInput = document.getElementById("minutes");
     const secondsInput = document.getElementById("seconds");
@@ -57,33 +64,26 @@ function calculateMusic() {
     let bpm = parseInt(bpmInput.value);
     let calculatedFields = [];
 
-    // Perform calculations only if the appropriate pairs of inputs are provided
+    // Reset input modification flags
+    inputModified = { bars: false, minutes: false, seconds: false, bpm: false };
+
     if (bars && bpm && !minutes && !seconds) {
-        //console.log("Calculating time from bars and bpm");
         totalSeconds = Math.ceil((bars * 60) / bpm);
         minutesInput.value = Math.floor(totalSeconds / 60);
         secondsInput.value = totalSeconds % 60;
         calculatedFields = [minutesInput, secondsInput];
+        inputModified.minutes = inputModified.seconds = true;
     } else if (totalSeconds > 0 && bpm && !bars) {
-        //console.log("Calculating bars from totalSeconds and bpm");
         bars = Math.ceil((totalSeconds * bpm) / 60);
         barsInput.value = bars;
         calculatedFields = [barsInput];
+        inputModified.bars = true;
     } else if (bars && totalSeconds > 0 && !bpm) {
-        //console.log("Calculating bpm from bars and totalSeconds");
         bpm = Math.ceil((bars * 60) / totalSeconds);
         bpmInput.value = bpm;
         calculatedFields = [bpmInput];
+        inputModified.bpm = true;
     }
-    //onsole.log(`calculatedFields: `, calculatedFields.map(field => field.id));
-
-
-    // Clear highlights from all fields except those being recalculated
-    [barsInput, minutesInput, secondsInput, bpmInput].forEach((input) => {
-        if (!calculatedFields.includes(input)) {
-            input.classList.remove("highlighted");
-        }
-    });
 
     // Highlight all calculated fields
     calculatedFields.forEach((field) => {
@@ -92,36 +92,48 @@ function calculateMusic() {
 }
 
 
-
-
 // Function to handle input changes
-function handleInput() {    
+function handleInput(event) {
     const barsInput = document.getElementById("bars");
     const minutesInput = document.getElementById("minutes");
     const secondsInput = document.getElementById("seconds");
     const bpmInput = document.getElementById("bpm");
 
-    const inputs = [barsInput, minutesInput, secondsInput, bpmInput];
-    const filledInputs = Array.from(inputs).filter(
-        (input) => input.value.trim() !== ""
-    );
+    // Assess the current input values
+    const bars = barsInput.value.trim();
+    const minutes = minutesInput.value.trim();
+    const seconds = secondsInput.value.trim();
+    const bpm = bpmInput.value.trim();
 
-    // Enable the Calculate button only if a valid combination of inputs is provided
+    // Log current input states
+    console.log(`Input states: Bars: ${bars}, Minutes: ${minutes}, Seconds: ${seconds}, BPM: ${bpm}`);
+
+    // Determine if there's enough information to calculate something
+    const hasTime = minutes !== "" || seconds !== "";
+    const hasBarsOrBPM = bars !== "" || bpm !== "";
+
+    // Check combinations of filled inputs
     let isValidCombination = false;
-
-    // Check if there are at least two inputs filled and at least one of them is either bars or BPM
-    if (filledInputs.length >= 2) {
-        const hasTime =
-            minutesInput.value.trim() !== "" || secondsInput.value.trim() !== "";
-        const hasBarsOrBPM =
-            barsInput.value.trim() !== "" || bpmInput.value.trim() !== "";
-        isValidCombination =
-            (hasBarsOrBPM && hasTime) ||
-            (barsInput.value.trim() !== "" && bpmInput.value.trim() !== "");
+    if (bars && bpm && (!minutes || !seconds)) {
+        // Allows recalculation of time if bars and bpm are present and time is adjusted
+        isValidCombination = true;
+    } else if (hasTime && bpm && !bars) {
+        // Allows calculation of bars if time and bpm are present
+        isValidCombination = true;
+    } else if (hasTime && bars && !bpm) {
+        // Allows calculation of bpm if time and bars are present
+        isValidCombination = true;
     }
 
+    // Log the decision to enable or disable the Calculate button
+    console.log(`Button should be enabled: ${isValidCombination}`);
+
+    // Enable or disable the Calculate button based on current valid combinations
     document.getElementById("calculateButton").disabled = !isValidCombination;
 }
+
+
+
 
 // Initial call to handleInput to set the proper state on page load
 handleInput();
