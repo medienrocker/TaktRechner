@@ -28,6 +28,11 @@ document.addEventListener("DOMContentLoaded", function () {
     // Bindet resetFields an den Reset-Button
     document.getElementById("resetButton").addEventListener("click", resetFields);
 
+    // bindet alle input fields an die updateHint function
+    document.querySelectorAll('input[type="number"]').forEach(input => {
+        input.addEventListener("input", updateHint);
+    });
+
     // Globaler Event Listener für die Eingabesanierung
     document.addEventListener('input', function (event) {
         if (event.target.type === 'number') {
@@ -189,4 +194,34 @@ function resetFields() {
     // Also reset any stored BPM tap times
     tapTimes = [];
     handleInput();
+}
+
+// Gives the user a hint if more input is needed to calculate
+function updateHint() {
+    const barsInput = document.getElementById("bars").value.trim();
+    const minutesInput = document.getElementById("minutes").value.trim();
+    const secondsInput = document.getElementById("seconds").value.trim();
+    const bpmInput = document.getElementById("bpm").value.trim();
+    const timeInput = minutesInput || secondsInput;
+
+    let hintMessage = "";
+    const hintContainer = document.getElementById("hint");
+
+    if (bpmInput && !barsInput && !timeInput) {
+        hintMessage = "A) Please enter the number of bars to calculate Song duration or " +
+            "B) enter minutes and/or seconds to calculate how much bars the song has!";
+    } else if (barsInput && !bpmInput && !timeInput) {
+        hintMessage = "A) Please enter the bpm to calculate Song duration or " +
+            "B) enter minutes and/or seconds to calculate the tempo of the Song (BPM)!";
+    } else if (timeInput && !barsInput && !bpmInput) {
+        hintMessage = "A) Please enter the number of bars to calculate the BPM or " +
+            "B) enter the Tempo (BPM) to calculate how much bars the song has!";
+    } else {
+        hintContainer.style.display = "none";
+        return;  // If none of the above conditions are met, hide the hint and exit the function.
+    }
+
+    // Display the hint message only if one of the conditions is true
+    hintContainer.textContent = hintMessage;
+    hintContainer.style.display = "block";
 }
