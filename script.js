@@ -225,3 +225,64 @@ function updateHint() {
     hintContainer.textContent = hintMessage;
     hintContainer.style.display = "block";
 }
+
+// Metronom functionality
+document.getElementById("playButton").addEventListener("click", function () {
+    startMetronome();
+});
+
+document.getElementById("stopButton").addEventListener("click", function () {
+    stopMetronome();
+});
+
+let metronomeInterval;
+function startMetronome() {
+    const bpm = parseInt(document.getElementById("bpm").value);
+    if (isNaN(bpm) || bpm <= 0) {
+        alert("Please enter a valid BPM.");
+        return;
+    }
+
+    const rhythmValue = document.getElementById("rhythmSelect").value;
+    const beatDuration = 60000 / bpm; // Duration of one beat in milliseconds
+
+    let rhythmFactor;
+    switch (rhythmValue) {
+        case "1":
+            rhythmFactor = 1; // Quarter note
+            break;
+        case "2":
+            rhythmFactor = 0.5; // Eighth note
+            break;
+        case "3":
+            rhythmFactor = 1.5; // Dotted quarter note for 6/8 time
+            break;
+        default:
+            rhythmFactor = 1;
+    }
+
+    const intervalDuration = beatDuration * rhythmFactor;
+
+    if (metronomeInterval) clearInterval(metronomeInterval);
+    metronomeInterval = setInterval(playSound, intervalDuration);
+
+    document.getElementById("playButton").disabled = true;
+    document.getElementById("stopButton").disabled = false;
+}
+
+function stopMetronome() {
+    clearInterval(metronomeInterval);
+    document.getElementById("playButton").disabled = false;
+    document.getElementById("stopButton").disabled = true;
+}
+
+
+// Create a single Audio object to be reused
+const audio = new Audio('audio/CLick01.mp3');
+
+function playSound() {
+    audio.currentTime = 0; // Reset the sound to start
+    audio.play();
+}
+
+

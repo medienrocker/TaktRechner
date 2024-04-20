@@ -31,7 +31,23 @@
     <button type="button" id="calculateButton">Calculate</button>
     <button type="button" id="bpmTapper" class="tapper">Tap</button>
     <button type="button" id="resetButton" class="reset" type="button">Reset</button>
+<br>
+<hr>
+
+<div id="metronomeControls">
+    <label for="rhythmSelect">Choose a rhythm:</label>
+    <select id="rhythmSelect">
+        <option value="1">1/4 (Quarter note)</option>
+        <option value="2">1/8 (Eighth note)</option>
+        <option value="3">6/8 (Dotted quarter note)</option>
+    </select>
+
+    <button id="playButton">Play</button>
+    <button id="stopButton" disabled>Stop</button>
+</div>
+
 </form>
+
     <script src="script.js"></script>
 </body>
 
