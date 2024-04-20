@@ -9,29 +9,28 @@
 </head>
 
 <body>
-    <h1>Bar Calculator</h1>
-    <form id="musicForm">
-        <div class="mbc_line">
-            <label for="bpm">BPM:</label>
-            <input type="number" id="bpm" min="0" step="1" placeholder="Enter BPM (e.g., 120)">
-        </div>
-        <div class="mbc_line">
-            <label for="minutes">Minutes:</label>
-            <input type="number" id="minutes" min="0" step="1" placeholder="Enter minutes (e.g., 3)">
-        </div>
-        <div class="mbc_line">
-            <label for="seconds">Seconds:</label>
-            <input type="number" id="seconds" min="0" step="1" placeholder="Enter seconds (e.g., 45)">
-        </div>
-        <div class="mbc_line">
-            <label for="bars">Bars:</label>
-            <input type="number" id="bars" min="0" step="1" placeholder="Enter number of bars (optional)">
-        </div>
-        <button type="button" onclick="calculateMusic()">Calculate</button>
-        <button type="button" id="bpmTapper" class="tapper">Tap</button>
-
-        <div id="result"></div>
-    </form>
+<h1>Bar Calculator</h1>
+<form id="musicForm">
+    <div class="mbc_line">
+        <label for="bpm">BPM:</label>
+        <input type="number" id="bpm" min="0" step="1" placeholder="Enter BPM (e.g., 120)">
+    </div>
+    <div class="mbc_line">
+        <label for="minutes">Minutes:</label>
+        <input type="number" id="minutes" min="0" step="1" placeholder="Enter minutes (e.g., 3)">
+    </div>
+    <div class="mbc_line">
+        <label for="seconds">Seconds:</label>
+        <input type="number" id="seconds" min="0" step="1" placeholder="Enter seconds (e.g., 45)">
+    </div>
+    <div class="mbc_line">
+        <label for="bars">Bars:</label>
+        <input type="number" id="bars" min="0" step="1" placeholder="Enter number of bars (optional)">
+    </div>
+    <button type="button" id="calculateButton" onclick="calculateMusic()">Calculate</button>
+    <button type="button" id="bpmTapper" class="tapper">Tap</button>
+    <button type="button" id="resetButton" class="reset" type="button">Reset</button>
+</form>
     <script src="script.js"></script>
 </body>
 

@@ -3,14 +3,17 @@
     --background-color: #f4f4f4;
     --form-background-color: white;
     --input-border-color: #ddd;
+    --color-dark-gray: #333;
     --input-border-color2: rgb(79, 79, 79);
-    --button-background-color: rgb(255, 24, 182); /* #5cb85c; */
+    --button-background-color: rgb(255, 24, 182);
+    /* #5cb85c; */
     --button-hover-background-color: rgb(209, 28, 152);
     --button-text-color: white;
     --highlight-border-color: rgb(255, 24, 182);
     --highlight-shadow-color: rgb(255, 24, 182);
     --shadow-color: rgba(0, 0, 0, 0.1);
-    --tap-active-color: rgb(255, 193, 24);
+    --tap-active-color: rgb(92, 184, 92);
+    --alert-color: #ffeb3b;
 }
 
 body {
@@ -54,12 +57,22 @@ button {
     width: 100%;
     background-color: var(--button-background-color);
     color: var(--button-text-color);
-    border: none;
     cursor: pointer;
 }
 
 button:hover {
     background-color: var(--button-hover-background-color);
+}
+
+button:disabled {
+    background-color: #ccc;
+    color: #666;
+    cursor: not-allowed;
+    border: 2px solid #999;
+}
+
+#calculateButton {
+    border-radius: 6px;
 }
 
 label {
@@ -96,4 +109,20 @@ label {
 
 .tapper:active {
     background-color: var(--tap-active-color);
+}
+
+.reset {
+    padding: 8px;
+    margin-top: 5px;
+    border: 2px solid var(--input-border-color);
+    border-radius: 4px;
+    display: block;
+    width: 50%;
+    background-color: var(--input-border-color);
+    color: var(--color-dark-gray);
+    cursor: pointer;
+}
+
+.reset:hover {
+    background-color: var(--alert-color);
 }
