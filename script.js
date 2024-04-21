@@ -115,7 +115,7 @@ function handleInput(event) {
     document.getElementById("playButton").disabled = !canPlay;
 
     // Log current input states
-    console.log(`Input states: Bars: ${bars}, Minutes: ${minutes}, Seconds: ${seconds}, BPM: ${bpm}`);
+    //console.log(`Input states: Bars: ${bars}, Minutes: ${minutes}, Seconds: ${seconds}, BPM: ${bpm}`);
 
     // Determine if there's enough information to calculate something
     const hasTime = minutes !== "" || seconds !== "";
@@ -135,7 +135,7 @@ function handleInput(event) {
     }
 
     // Log the decision to enable or disable the Calculate button
-    console.log(`Button should be enabled: ${isValidCombination}`);
+    //console.log(`Button should be enabled: ${isValidCombination}`);
 
     // Enable or disable the Calculate button based on current valid combinations
     document.getElementById("calculateButton").disabled = !isValidCombination;
@@ -247,20 +247,27 @@ function getTickInterval(bpm, rhythmFactor) {
 }
 
 function calculateTicksPerBar(rhythmValue) {
-    // Determines how many ticks occur in one bar based on the rhythm
+    // Adjust the ticks per bar based on the rhythm
     switch (rhythmValue) {
-        case "1": // Full note (1)
-            return 1; // 4 ticks per bar in 4/4 time
-        case "2": // Quarter note (1/4)
-            return 2; // 4 ticks per bar in 4/4 time
-        case "3": // Eighth note (1/8)
-            return 4; // 8 ticks per bar in 4/4 time
-        case "4": // Dotted quarter note (6/8)
-            return 3; // 6 ticks per bar in 6/8 time
+        case "1": // Quarter note
+            ticksPerBar = 4; // 4 beats in a typical 4/4 bar
+            return 1;
+        case "2": // Eighth note
+            ticksPerBar = 8; // 4 quarter notes in a 4/4 bar
+            return 2;
+        case "3": // Sixtenth NOte
+            ticksPerBar = 16; // 8 eighth notes in a 4/4 bar
+            return 4;
+        case "4": // Dotted quarter note (commonly used in 6/8 time)
+            ticksPerBar = 6; // Typically 6 eighth notes in a 6/8 bar
+            return 2;
         default:
-            return 1; // Default to quarter note if unsure
+            ticksPerBar = 4; // Default to 4/4 time
+            return 1;
     }
 }
+
+
 
 function playMetronomeIndefinitelyOrForDuration(totalTime, bpm, rhythmValue) {
     const ticksPerBar = calculateTicksPerBar(rhythmValue);
@@ -282,6 +289,8 @@ function playMetronomeIndefinitelyOrForDuration(totalTime, bpm, rhythmValue) {
             stopMetronome(); // Stop after the calculated number of ticks
         }, totalTicks * intervalDuration);
     }
+
+    console.log("total ticks: " + totalTicks + " int.Duration: " + intervalDuration);
 }
 
 
@@ -292,6 +301,8 @@ function startMetronome() {
     const minutes = document.getElementById("minutes").value.trim();
     const seconds = document.getElementById("seconds").value.trim();
 
+    currentTick = 0; // Reset tick count when metronome starts
+
     if (isNaN(bpm) || bpm <= 0) {
         alert("Please enter a valid BPM.");
         return;
@@ -300,6 +311,7 @@ function startMetronome() {
     let totalTime = 0;
     if (bars) {
         totalTime = (60000 / bpm) * bars * 4; // Total duration for 4 beats per bar
+        console.log("total time: " + totalTime);
     } else if (minutes || seconds) {
         totalTime = (parseInt(minutes) * 60 + parseInt(seconds)) * 1000;
     }
@@ -314,18 +326,26 @@ function startMetronome() {
 
 function stopMetronome() {
     clearInterval(metronomeInterval);
+    currentTick = 0; // Reset tick count when stopping the metronome
     document.getElementById("playButton").disabled = false;
     document.getElementById("stopButton").disabled = true;
 }
 
 
 
-// Create a single Audio object to be reused
-const audio = new Audio('audio/CLick01.mp3');
+// Create two single Audio objects to be reused
+const highSound = new Audio('audio/Click01-high.mp3');
+const lowSound = new Audio('audio/Click01-low.mp3');
+
+let currentTick = 0;
 
 function playSound() {
-    audio.currentTime = 0; // Reset the sound to start
-    audio.play();
+    if (currentTick % ticksPerBar === 0) {
+        highSound.currentTime = 0;
+        highSound.play();
+    } else {
+        lowSound.currentTime = 0;
+        lowSound.play();
+    }
+    currentTick = (currentTick + 1) % ticksPerBar; // This ensures the counter resets after reaching the total ticks per bar
 }
-
-

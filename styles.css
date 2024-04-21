@@ -149,3 +149,9 @@ label {
     margin: 5px;
     padding: 5px;
 }
+
+#metronomeControls #playButton,
+#metronomeControls #stopButton {
+    display: inline-block;
+    width: 40%;
+}
