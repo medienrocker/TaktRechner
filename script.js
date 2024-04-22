@@ -294,6 +294,19 @@ function playMetronomeIndefinitelyOrForDuration(totalTime, bpm, rhythmValue) {
 }
 
 
+function calculateTotalTime(bpm, bars, minutes, seconds) {
+    let totalTime = 0;
+    if (bars) {
+        totalTime = (60000 / bpm) * bars * 4; // Total duration for 4 beats per bar
+    } else if (minutes || seconds) {
+        totalTime = (parseInt(minutes) * 60 + parseInt(seconds)) * 1000;
+    }
+    console.log("Total time: " + totalTime);
+    return totalTime;
+}
+
+
+// START the metronome
 function startMetronome() {
     const bpm = parseInt(document.getElementById("bpm").value);
     const rhythmValue = document.getElementById("rhythmSelect").value;
@@ -308,13 +321,10 @@ function startMetronome() {
         return;
     }
 
-    let totalTime = 0;
-    if (bars) {
-        totalTime = (60000 / bpm) * bars * 4; // Total duration for 4 beats per bar
-        console.log("total time: " + totalTime);
-    } else if (minutes || seconds) {
-        totalTime = (parseInt(minutes) * 60 + parseInt(seconds)) * 1000;
-    }
+
+    setupLights(calculateTicksPerBar(rhythmValue));
+
+    const totalTime = calculateTotalTime(bpm, bars, minutes, seconds);
 
     // Start playing the metronome
     playMetronomeIndefinitelyOrForDuration(totalTime, bpm, rhythmValue);
@@ -340,6 +350,7 @@ const lowSound = new Audio('audio/Click01-low.mp3');
 let currentTick = 0;
 
 function playSound() {
+    
     if (currentTick % ticksPerBar === 0) {
         highSound.currentTime = 0;
         highSound.play();
@@ -347,5 +358,45 @@ function playSound() {
         lowSound.currentTime = 0;
         lowSound.play();
     }
-    currentTick = (currentTick + 1) % ticksPerBar; // This ensures the counter resets after reaching the total ticks per bar
+    
+    updateLights(currentTick); // Update the lights right before playing sound
+
+    currentTick = (currentTick + 1) % ticksPerBar; // Ensures the counter resets after reaching the total ticks per bar
+}
+
+
+
+// Volume control
+document.getElementById('volumeControl').addEventListener('input', function () {
+    const volume = this.value; // Get the value from the slider
+    highSound.volume = volume; // Set the volume for high sound
+    lowSound.volume = volume; // Set the volume for low sound
+});
+
+window.onload = function () {
+    const initialVolume = document.getElementById('volumeControl').value;
+    highSound.volume = initialVolume;
+    lowSound.volume = initialVolume;
+};
+
+
+// Light indicator
+function setupLights(ticksPerBar) {
+    const container = document.getElementById('lightContainer');
+    container.innerHTML = ''; // Clear existing lights
+
+    for (let i = 0; i < ticksPerBar; i++) {
+        let light = document.createElement('div');
+        container.appendChild(light);
+    }
+}
+
+function updateLights(currentTick) {
+    const lights = document.querySelectorAll('#lightContainer div');
+    lights.forEach((light, index) => {
+        light.className = ''; // Reset class
+        if (index === currentTick) {
+            light.classList.add(index === 0 ? 'first-beat' : 'active');
+        }
+    });
 }

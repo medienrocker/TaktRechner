@@ -138,6 +138,8 @@ label {
     font-size: small;
 }
 
+
+/* Metronom / Click styling */
 #metronomeControls {
     margin-top: 20px;
     text-align: center;
@@ -154,4 +156,28 @@ label {
 #metronomeControls #stopButton {
     display: inline-block;
     width: 40%;
+}
+
+#volumeControl {
+    width: 200px;
+    margin: 10px;
+}
+
+/* Light indikator styling */
+
+#lightContainer div {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: gray;
+    margin: 5px;
+    display: inline-block;
+}
+
+#lightContainer div.active {
+    background-color: rgb(248, 177, 24);
+}
+
+#lightContainer div.first-beat {
+    background-color: rgb(40, 119, 245);
 }
