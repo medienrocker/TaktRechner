@@ -1,7 +1,7 @@
 :root {
     /* Color Definitions */
     --background-color: #f4f4f4;
-    --form-background-color: white;
+    --form-background-color: rgb(174, 174, 174);
     --input-border-color: #ddd;
     --color-dark-gray: #333;
     --input-border-color2: rgb(79, 79, 79);
@@ -70,6 +70,10 @@ button:disabled {
     cursor: not-allowed;
     border: 2px solid #999;
 }
+
+/* .mbc_line {
+    display: flex;
+} */
 
 #calculateButton {
     border-radius: 6px;
@@ -176,8 +180,14 @@ label {
 
 #lightContainer div.active {
     background-color: rgb(248, 177, 24);
+    -webkit-box-shadow: 0px 0px 9px 1px rgba(248, 177, 24, 0.5);
+    -moz-box-shadow: 0px 0px 9px 1px rgba(248, 177, 24, 0.5);
+    box-shadow: 0px 0px 9px 1px rgba(248, 177, 24, 0.5);
 }
 
 #lightContainer div.first-beat {
     background-color: rgb(40, 119, 245);
+    -webkit-box-shadow: 0px 0px 9px 1px rgba(40, 119, 245, 0.5);
+    -moz-box-shadow: 0px 0px 9px 1px rgba(40, 119, 245, 0.5);
+    box-shadow: 0px 0px 9px 1px rgba(40, 119, 245, 0.5);
 }

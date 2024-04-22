@@ -1,5 +1,9 @@
-// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// ---- Musicians  Helper -----
 // initialize base variables
+let beatsPerBar = 4; // Default to 4 beats per bar
+let clicksPerBeat = 1; // Default to 1 click per beat (quarter notes in 4/4 time)
+let totalTicksPerBar;
+
 let tapTimes = [];
 let bpmTimeout;
 let lastCalculated = null;
@@ -9,7 +13,7 @@ let inputModified = {
     seconds: false,
     bpm: false
 };
-
+let inputFields;
 
 // adds event listeners to all input fields and
 // adds the sanitize function to all input fields
@@ -39,6 +43,8 @@ document.addEventListener("DOMContentLoaded", function () {
             sanitizeInput(event);
         }
     });
+
+    inputFields = document.querySelectorAll('input[type="number"]');
 
     // Initialer Aufruf von handleInput, um den korrekten Zustand des Calculate-Buttons zu setzen
     handleInput();
@@ -142,8 +148,6 @@ function handleInput(event) {
 }
 
 
-
-
 // Initial call to handleInput to set the proper state on page load
 handleInput();
 
@@ -158,7 +162,11 @@ function tapBPM() {
     const bpmInput = document.getElementById("bpm");
 
     // Clear previous highlight
-    bpmInput.classList.remove("highlighted");
+    //bpmInput.classList.remove("highlighted");
+    inputFields.forEach((field) => {
+        field.value = "";
+        field.classList.remove("highlighted");
+    });
 
     // When there are two or more taps, calculate the BPM
     if (tapTimes.length > 1) {
@@ -172,13 +180,14 @@ function tapBPM() {
 
         // Highlight the BPM input field
         bpmInput.classList.add("highlighted");
+        updateHint();
     }
 
     // Reset if more than 2 seconds pass between taps
     clearTimeout(bpmTimeout);
     bpmTimeout = setTimeout(() => {
         tapTimes = [];
-        bpmInput.classList.remove("highlighted");
+        //bpmInput.classList.remove("highlighted");
     }, 2000);
     handleInput();
 }
@@ -187,7 +196,7 @@ function tapBPM() {
 // resets all input fields
 function resetFields() {
     // Select all the input fields by class or individually
-    const inputFields = document.querySelectorAll('input[type="number"]');
+    //const inputFields = document.querySelectorAll('input[type="number"]');
 
     // Clear each field's value and remove the 'highlighted' class
     inputFields.forEach((field) => {
@@ -246,52 +255,58 @@ function getTickInterval(bpm, rhythmFactor) {
     return (60000 / bpm) / rhythmFactor; // Shorter intervals for more frequent ticks
 }
 
+
 function calculateTicksPerBar(rhythmValue) {
-    // Adjust the ticks per bar based on the rhythm
     switch (rhythmValue) {
         case "1": // Quarter note
-            ticksPerBar = 4; // 4 beats in a typical 4/4 bar
-            return 1;
+            clicksPerBeat = 1; // One click per beat
+            beatsPerBar = 4;
+            break;
         case "2": // Eighth note
-            ticksPerBar = 8; // 4 quarter notes in a 4/4 bar
-            return 2;
-        case "3": // Sixtenth NOte
-            ticksPerBar = 16; // 8 eighth notes in a 4/4 bar
-            return 4;
-        case "4": // Dotted quarter note (commonly used in 6/8 time)
-            ticksPerBar = 6; // Typically 6 eighth notes in a 6/8 bar
-            return 2;
+            clicksPerBeat = 2; // Two clicks per quarter beat
+            beatsPerBar = 4;
+            break;
+        case "3": // Sixteenth note
+            clicksPerBeat = 4; // Four clicks per quarter beat
+            beatsPerBar = 4;
+            break;
+        case "4": // Dotted quarter note (common in 6/8 time)
+            clicksPerBeat = 1; // One click per dotted quarter beat
+            beatsPerBar = 6;
+            break;
         default:
-            ticksPerBar = 4; // Default to 4/4 time
-            return 1;
+            clicksPerBeat = 1;
+            beatsPerBar = 4;
+            break;
     }
+    setupLights(beatsPerBar * clicksPerBeat); // Setup lights according to the total ticks per bar
 }
 
 
 
+
 function playMetronomeIndefinitelyOrForDuration(totalTime, bpm, rhythmValue) {
-    const ticksPerBar = calculateTicksPerBar(rhythmValue);
-    const intervalDuration = (60000 / bpm) / ticksPerBar;
+    calculateTicksPerBar(rhythmValue); // Ensures clicksPerBeat and beatsPerBar are updated
+    totalTicksPerBar = beatsPerBar * clicksPerBeat;
+    const intervalDuration = (60000 / bpm) / clicksPerBeat; // Interval based on clicks per beat
 
     let totalTicks = Infinity;
     if (totalTime > 0) {
-        // Calculate the total number of intervals that fit in the total time
         totalTicks = Math.floor(totalTime / intervalDuration);
     }
 
     if (metronomeInterval) {
-        clearInterval(metronomeInterval); // Clear previous interval if any
+        clearInterval(metronomeInterval);
     }
     metronomeInterval = setInterval(playSound, intervalDuration);
 
     if (totalTicks !== Infinity) {
         setTimeout(() => {
-            stopMetronome(); // Stop after the calculated number of ticks
+            stopMetronome();
         }, totalTicks * intervalDuration);
     }
-
-    console.log("total ticks: " + totalTicks + " int.Duration: " + intervalDuration);
 }
+
 
 
 function calculateTotalTime(bpm, bars, minutes, seconds) {
@@ -301,7 +316,7 @@ function calculateTotalTime(bpm, bars, minutes, seconds) {
     } else if (minutes || seconds) {
         totalTime = (parseInt(minutes) * 60 + parseInt(seconds)) * 1000;
     }
-    console.log("Total time: " + totalTime);
+    //console.log("Total time: " + totalTime);
     return totalTime;
 }
 
@@ -342,26 +357,23 @@ function stopMetronome() {
 }
 
 
-
-// Create two single Audio objects to be reused
-const highSound = new Audio('audio/Click01-high.mp3');
-const lowSound = new Audio('audio/Click01-low.mp3');
-
 let currentTick = 0;
+const standardClick = new Audio('audio/Click01-standard.mp3');
+const highClick = new Audio('audio/Click01-high.mp3');
+const lowClick = new Audio('audio/Click01-low.mp3');
 
 function playSound() {
-    
-    if (currentTick % ticksPerBar === 0) {
-        highSound.currentTime = 0;
-        highSound.play();
+    console.log("playSound started!");
+    if (currentTick % totalTicksPerBar === 0) {
+        highClick.play(); // High sound for the first click of each bar
+    } else if (currentTick % clicksPerBeat === 0) {
+        standardClick.play(); // Standard click for the main beats
     } else {
-        lowSound.currentTime = 0;
-        lowSound.play();
+        lowClick.play(); // Low click for subdivisions
     }
     
-    updateLights(currentTick); // Update the lights right before playing sound
-
-    currentTick = (currentTick + 1) % ticksPerBar; // Ensures the counter resets after reaching the total ticks per bar
+    updateLights(currentTick);
+    currentTick = (currentTick + 1) % totalTicksPerBar; // Ensures the counter resets
 }
 
 
@@ -375,17 +387,17 @@ document.getElementById('volumeControl').addEventListener('input', function () {
 
 window.onload = function () {
     const initialVolume = document.getElementById('volumeControl').value;
-    highSound.volume = initialVolume;
-    lowSound.volume = initialVolume;
+    highClick.volume = initialVolume;
+    lowClick.volume = initialVolume;
 };
 
 
 // Light indicator
-function setupLights(ticksPerBar) {
+function setupLights(totalTicksPerBar) {
     const container = document.getElementById('lightContainer');
     container.innerHTML = ''; // Clear existing lights
 
-    for (let i = 0; i < ticksPerBar; i++) {
+    for (let i = 0; i < totalTicksPerBar; i++) {
         let light = document.createElement('div');
         container.appendChild(light);
     }
