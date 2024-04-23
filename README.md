@@ -4,7 +4,7 @@ Than I added a Tap-Tempo button (could be handy).
 Than I thought, maybe integrate a click Metronome, cause you allready did the math...
 ...to be continued ;)
 
-It is by far not very accurate and there are some usabillity meehhs. But it it fun and I learn alot on the way.
+It is by far not very accurate and there are some usabillity meehhs. But it is fun and I learn alot on the way.
 
 Roadmap:
 - create Android App
