@@ -357,10 +357,27 @@ function stopMetronome() {
 }
 
 
-let currentTick = 0;
+// Create audio objects
 const standardClick = new Audio('audio/Click01-standard.mp3');
 const highClick = new Audio('audio/Click01-high.mp3');
 const lowClick = new Audio('audio/Click01-low.mp3');
+
+// Preload function
+function preloadAudio(audio) {
+    const src = audio.src;  // Ensure the source is set
+    audio.preload = 'auto'; // Preload the audio
+    audio.load();          // Start loading the audio
+}
+
+// Call the preload function on window load or when appropriate
+window.onload = function () {
+    preloadAudio(standardClick);
+    preloadAudio(highClick);
+    preloadAudio(lowClick);
+};
+
+
+let currentTick = 0;
 
 function playSound() {
     console.log("playSound started!");
@@ -381,12 +398,14 @@ function playSound() {
 // Volume control
 document.getElementById('volumeControl').addEventListener('input', function () {
     const volume = this.value; // Get the value from the slider
-    highSound.volume = volume; // Set the volume for high sound
-    lowSound.volume = volume; // Set the volume for low sound
+    standardClick.volume = volume; // Set the volume for high sound
+    highClick.volume = volume; // Set the volume for low sound
+    lowClick.volume = volume; // Set the volume for standard sound
 });
 
 window.onload = function () {
     const initialVolume = document.getElementById('volumeControl').value;
+    standardClick.volume = initialVolume;
     highClick.volume = initialVolume;
     lowClick.volume = initialVolume;
 };

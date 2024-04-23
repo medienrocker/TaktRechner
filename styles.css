@@ -168,11 +168,11 @@ label {
 }
 
 /* Light indikator styling */
-
 #lightContainer div {
     width: 20px;
     height: 20px;
     border-radius: 50%;
+    border: 2px solid rgb(70, 70, 70);
     background-color: gray;
     margin: 5px;
     display: inline-block;
