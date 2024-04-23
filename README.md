@@ -13,6 +13,6 @@ Roadmap:
 - create iOS App
 - ...
 
-- Feel free to build your own with this one as a starting point.
-- Kind regards ;)
-- Falk (aka medienrocker)
+Feel free to build your own with this one as a starting point.
+Kind regards ;)
+Falk (aka medienrocker)
