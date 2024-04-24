@@ -73,11 +73,21 @@ class Metronome {
         const bpmInput = document.getElementById("bpm").value.trim();
         const rhythmSelected = document.getElementById("rhythmSelect").value;
 
-        const canCalculate = bpmInput && (barsInput || (minutesInput && secondsInput));
+        // Define a variable to check if time is provided
+        const timeProvided = minutesInput || secondsInput;
+
+        // Simplify the conditions for enabling the Calculate button
+        const canCalculate = (bpmInput && (barsInput || timeProvided)) || (barsInput && (bpmInput || timeProvided));
+
+        // Update the disabled property of the Calculate button based on canCalculate
         document.getElementById("calculateButton").disabled = !canCalculate;
 
-        const canPlay = bpmInput && (barsInput || (minutesInput && secondsInput)) && rhythmSelected;
+        // Check if conditions to play the metronome are met
+        const canPlay = bpmInput && (barsInput || timeProvided) && rhythmSelected;
         document.getElementById("playButton").disabled = !canPlay;
+
+        // Optionally, update hint or other UI elements
+        this.updateHint();
     }
 
     calculateMusic() {
