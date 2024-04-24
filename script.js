@@ -37,6 +37,7 @@ class Metronome {
         // call handleInput initialy to set all button states on startup correctly
         this.handleInput = this.handleInput.bind(this); // Bind in the constructor
         this.handleInput(); // Now it's safe to call
+        this.updateHint(); // Set initial hint
 
     }
 
@@ -45,6 +46,7 @@ class Metronome {
             const inputs = document.querySelectorAll('input[type="number"]');
             inputs.forEach(input => {
                 input.addEventListener("input", this.handleInput.bind(this));
+                input.addEventListener("input", this.updateHint.bind(this)); // Update hint on input change
             });
 
             document.getElementById("calculateButton").addEventListener("click", this.calculateMusic.bind(this));
@@ -257,6 +259,37 @@ class Metronome {
             }
         });
     }
+
+
+    updateHint() {
+        const barsInput = document.getElementById("bars").value.trim();
+        const minutesInput = document.getElementById("minutes").value.trim();
+        const secondsInput = document.getElementById("seconds").value.trim();
+        const bpmInput = document.getElementById("bpm").value.trim();
+        const timeInput = minutesInput || secondsInput;
+
+        let hintMessage = "";
+        const hintContainer = document.getElementById("hint");
+
+        if (bpmInput && !barsInput && !timeInput) {
+            hintMessage = "A) Please enter the number of bars to calculate song duration, or " +
+                "B) enter minutes and/or seconds to calculate how many bars the song has.";
+        } else if (barsInput && !bpmInput && !timeInput) {
+            hintMessage = "A) Please enter the BPM to calculate song duration, or " +
+                "B) enter minutes and/or seconds to calculate the tempo of the song (BPM).";
+        } else if (timeInput && !barsInput && !bpmInput) {
+            hintMessage = "A) Please enter the number of bars to calculate the BPM, or " +
+                "B) enter the BPM to calculate how many bars the song has.";
+        } else {
+            hintContainer.style.display = "none";
+            return;  // Exit the function if no hint is needed.
+        }
+
+        // Display the hint message only if one of the conditions is true
+        hintContainer.textContent = hintMessage;
+        hintContainer.style.display = "block";
+    }
+
 }
 
 new Metronome(); // Instantiates the Metronome class
